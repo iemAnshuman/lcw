@@ -16,7 +16,7 @@ void manager_req_t::add_entry(entry_t entry)
 
 bool manager_req_t::do_progress()
 {
-  if (entries.empty() || !lock.try_lock()) return false;
+  if (!lock.try_lock()) return false;
   if (entries.empty()) {
     lock.unlock();
     return false;
