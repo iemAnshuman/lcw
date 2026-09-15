@@ -307,7 +307,6 @@ bool backend_mpi_t::do_progress(device_t device)
   MPI_Status status;
   mpi::comp::entry_t entry;
   if (device_p->enable_put &&
-      device_p->pengine.put_entry.mpi_req != MPI_REQUEST_NULL &&
       device_p->pengine.put_entry_lock.try_lock()) {
     if (device_p->pengine.put_entry.mpi_req != MPI_REQUEST_NULL) {
       mpi::enter_stream_cs(device);
