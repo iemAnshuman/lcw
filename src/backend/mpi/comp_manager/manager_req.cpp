@@ -11,12 +11,14 @@ void manager_req_t::add_entry(entry_t entry)
   LCW_Log(LCW_LOG_TRACE, "comp", "Add request %p\n", entry.mpi_req);
   lock.lock();
   entries.push_back(entry);
+  nentries.store(entries.size(), std::memory_order_relaxed);
   lock.unlock();
 }
 
 bool manager_req_t::do_progress()
 {
-  if (!lock.try_lock()) return false;
+  if (nentries.load(std::memory_order_relaxed) == 0 || !lock.try_lock())
+    return false;
   if (entries.empty()) {
     lock.unlock();
     return false;
@@ -36,6 +38,7 @@ bool manager_req_t::do_progress()
   if (!succeed) {
     entries.push_back(entry);
   }
+  nentries.store(entries.size(), std::memory_order_relaxed);
   lock.unlock();
   if (!succeed) return false;
   // We have got something
